@@ -1,5 +1,5 @@
 <p align="center"> 
-    <img width="50%" src ="https://github.com/frossm/screensize/raw/master/graphics/PostIt.jpg">
+    <img width="30%" src ="https://github.com/frossm/screensize/raw/master/graphics/PostIt.jpg">
 </p> 
 
 # ScreenSize
