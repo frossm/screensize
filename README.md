@@ -1,14 +1,13 @@
 <p align="center"> 
-    <img width="30%" src ="https://github.com/frossm/screensize/raw/master/graphics/PostIt.jpg">
+	<img align="right" width="30%" src="https://github.com/frossm/screensize/raw/master/graphics/PostIt.jpg">
 </p> 
 
 # ScreenSize
 
 ScreenSize is a very simply program that returns the height and width, in pixels, of the current default display.
-
-
+<br>
+<br>
 ## Command Line Options
-
 Short Option|Long Option | Description
 ---------| -----------| --------------
 -x|--width|Display the width of the screen.  The `x` value
