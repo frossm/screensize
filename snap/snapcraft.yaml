@@ -1,0 +1,49 @@
+name: rpncalc
+version: '1.0.0'
+summary: Retrieves the screen size in pixels
+description: |
+  Screensize returns the horizontal (x) and the vertical (y) pixels
+  of the primary display
+  
+  Homepage: https://github.com/frossm/screensize
+  
+grade: stable
+confinement: strict
+base: core18
+
+title: ScreenSize
+website: https://github.com/frossm/screensize
+contact: screensize@fross.org
+issues: https://github.com/frossm/screensize/issues
+icon: graphics/PostIt-512x512.png
+license: MIT
+
+
+# Enable faster LZO compression
+compression: lzo
+
+apps:
+   screensize:
+      command: screensize-wrapper
+      plugs:
+         - network
+
+parts:
+   wrapper:
+      plugin: dump
+      source: snap/local
+      source-type: local
+
+   rpncalc:
+      plugin: maven
+      source: https://github.com/frossm/screensize.git
+      source-branch: master
+      source-type: git
+      after:
+         - wrapper
+
+      # Bypass a build issue where an absolute reference is made to a file outside of the snap filesystem 
+      # Ref: https://forum.snapcraft.io/t/resolve-package-contains-external-symlinks-error-when-trying-to-snap/2963/23
+      override-prime: |
+         snapcraftctl prime
+         rm -vf usr/lib/jvm/java-11-openjdk-*/lib/security/blacklisted.certs

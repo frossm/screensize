@@ -1,0 +1,182 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.fross</groupId>
+	<artifactId>screensize</artifactId>
+	<version>1.0.0</version>
+	<packaging>jar</packaging>
+	
+	<name>screensize</name>
+	<description>Retrieves the screen size in pixels</description>
+	<url>https://fross.org</url>
+	
+	<developers>
+		<developer>
+			<name>Michael Fross</name>
+			<email>michael@fross.org</email>
+			<url>https://fross.org</url>
+		</developer>
+	</developers>
+	
+	<organization>
+		<name>Sinister Igloo Softworks</name>
+		<url>fross.org</url>
+	</organization>
+	<inceptionYear>2022</inceptionYear>
+	
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/licenses/MIT</url>
+		</license>
+	</licenses>
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.release>11</maven.compiler.release>
+	</properties>
+	
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<!-- ========================================================================================== -->
+				<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin          -->
+				<!-- ========================================================================================== -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.10.1</version>
+				<configuration>
+					<release>${maven.compiler.release}</release>
+				</configuration>
+			</plugin>
+			
+			<!-- ========================================================================================== -->
+			<!-- Maven's Automated Testing Surefire plugin                                                  -->
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin          -->
+			<!-- ========================================================================================== -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M7</version>
+			</plugin>
+			
+			<!-- ========================================================================================== -->
+			<!-- Build single executable "FatJar" with all dependencies included using Apache Shade         -->
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-shade-plugin             -->
+			<!-- ========================================================================================== -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.3.0</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<finalName>${project.name}</finalName>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>org.junit.jupiter:junit-jupiter</exclude>
+										<exclude>META-INF/MANIFEST.MF</exclude>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+									</excludes>
+								</filter>
+							</filters>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<manifestEntries>
+										<Main-Class>org.fross.${project.name}.Main</Main-Class>
+									</manifestEntries>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<!-- ========================================================================================== -->
+			<!-- Set a pom property to the version numbers of the defined dependencies                      -->
+			<!-- https://mvnrepository.com/artifact/io.reformanda.semper/dependencyversion-maven-plugin     -->
+			<!--                                                                                            -->
+			<!-- Reference: https://gitlab.com/josh-cain/dependencyversion-maven-plugin                     -->
+			<!-- Example: The library dependency version reference is: ${org.fross:library:jar.version}     -->
+			<!-- ========================================================================================== -->
+			<plugin>
+				<groupId>io.reformanda.semper</groupId>
+				<artifactId>dependencyversion-maven-plugin</artifactId>
+				<version>1.0.1</version>
+				<executions>
+					<execution>
+						<id>set-all</id>
+						<goals>
+							<goal>set-version</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<!-- ============================================================================================== -->
+			<!-- Update snapcraft.yaml file to set the program and library versions                             -->
+			<!-- https://mvnrepository.com/artifact/com.google.code.maven-replacer-plugin/maven-replacer-plugin -->
+			<!-- ============================================================================================== -->
+			<plugin>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>replacer</artifactId>
+				<version>1.5.3</version>
+				<executions>
+					<execution>
+						<phase>initialize</phase>
+						<goals>
+							<goal>replace</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<file>snap/snapcraft.yaml</file>
+					<replacements>
+						<replacement>
+							<token>version:.*</token>
+							<value>version: '${project.version}'</value>
+						</replacement>
+						<replacement>
+							<token>source-tag:.*</token>
+							<value>source-tag: 'v${org.fross:library:jar.version}'</value>
+						</replacement>
+					</replacements>
+				</configuration>
+			</plugin>
+			
+		</plugins>
+	</build>
+	
+	<dependencies>
+		<!-- https://mvnrepository.com/artifact/com.beust/jcommander -->
+		<dependency>
+			<groupId>com.beust</groupId>
+			<artifactId>jcommander</artifactId>
+			<version>1.82</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.9.2</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+</project>
